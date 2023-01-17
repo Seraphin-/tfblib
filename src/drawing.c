@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
 
+#define MIRROR_SCREEN
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -74,6 +76,10 @@ void tfb_clear_win(u32 color)
 
 void tfb_draw_hline(int x, int y, int len, u32 color)
 {
+#ifdef MIRROR_SCREEN
+   x = __fb_win_w - x - len;
+   y = __fb_win_h - y;
+#endif
    if (x < 0) {
       len += x;
       x = 0;
@@ -91,6 +97,10 @@ void tfb_draw_hline(int x, int y, int len, u32 color)
 
 void tfb_draw_vline(int x, int y, int len, u32 color)
 {
+#ifdef MIRROR_SCREEN
+   x = __fb_win_w - x;
+   y = __fb_win_h - y - len;
+#endif
    int yend;
 
    if (y < 0) {
@@ -115,6 +125,10 @@ void tfb_draw_vline(int x, int y, int len, u32 color)
 
 void tfb_fill_rect(int x, int y, int w, int h, u32 color)
 {
+#ifdef MIRROR_SCREEN
+   x = __fb_win_w - x - w;
+   y = __fb_win_h - y - h;
+#endif
    u32 yend;
    void *dest;
 

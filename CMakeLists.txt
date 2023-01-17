@@ -104,7 +104,11 @@ configure_file(
 )
 
 file(GLOB LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
-add_library(tfb ${LIB_SOURCES} ${c_font_files} fonts/fonts_decls.c)
+if (BUILD_SHARED_LIBS)
+    add_library(tfb ${LIB_SOURCES} ${c_font_files} fonts/fonts_decls.c)
+else()
+    add_library(tfb STATIC ${LIB_SOURCES} ${c_font_files} fonts/fonts_decls.c)
+endif()
 
 add_subdirectory(examples)
 

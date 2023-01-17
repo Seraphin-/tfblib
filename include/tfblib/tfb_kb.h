@@ -6,6 +6,9 @@
  */
 
 #pragma once
+
+#ifdef ENABLE_TTY
+
 #include <stdint.h>
 
 /*
@@ -105,3 +108,4 @@ int tfb_get_fn_key_num(tfb_key_t k);
 #define TFB_KEY_F12     (tfb_int_fn_key_sequences[11])
 
 extern tfb_key_t *tfb_int_fn_key_sequences;
+#endif

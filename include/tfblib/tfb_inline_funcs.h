@@ -40,6 +40,10 @@ inline u32 tfb_make_color(u8 r, u8 g, u8 b)
 
 inline void tfb_draw_pixel(int x, int y, u32 color)
 {
+#if 1
+   x = __fb_win_w - x;
+   y = __fb_win_h - y;
+#endif
    x += __fb_off_x;
    y += __fb_off_y;
 

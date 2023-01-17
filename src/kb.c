@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: BSD-2-Clause */
+#ifdef ENABLE_TTY
 
 #include <tfblib/tfblib.h>
 #include <tfblib/tfb_kb.h>
@@ -279,3 +280,5 @@ int tfb_get_fn_key_num(tfb_key_t k)
 
    return 0;
 }
+
+#endif

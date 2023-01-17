@@ -20,10 +20,14 @@
 #include "font.h"
 
 #define DEFAULT_FB_DEVICE "/dev/fb0"
+#ifdef ENABLE_TTY
 #define DEFAULT_TTY_DEVICE "/dev/tty"
+#endif
 
 struct fb_var_screeninfo __fbi;
+#ifdef ENABLE_TTY
 int __tfb_ttyfd = -1;
+#endif
 
 static int fbfd = -1;
 
@@ -56,8 +60,10 @@ int tfb_acquire_fb(u32 flags, const char *fb_device, const char *tty_device)
    if (!fb_device)
       fb_device = DEFAULT_FB_DEVICE;
 
+#ifdef ENABLE_TTY
    if (!tty_device)
       tty_device = DEFAULT_TTY_DEVICE;
+#endif
 
    fbfd = open(fb_device, O_RDWR);
 
@@ -76,6 +82,12 @@ int tfb_acquire_fb(u32 flags, const char *fb_device, const char *tty_device)
       goto out;
    }
 
+   __fbi.activate |= FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
+   if (ioctl(fbfd, FBIOPUT_VSCREENINFO, &__fbi) != 0) {
+      ret = TFB_ERR_IOCTL_FB;
+      goto out;
+   }
+
    __fb_pitch = fb_fixinfo.line_length;
    __fb_size = __fb_pitch * __fbi.yres;
    __fb_pitch_div4 = __fb_pitch >> 2;
@@ -90,6 +102,7 @@ int tfb_acquire_fb(u32 flags, const char *fb_device, const char *tty_device)
       goto out;
    }
 
+#ifdef ENABLE_TTY
    __tfb_ttyfd = open(tty_device, O_RDWR);
 
    if (__tfb_ttyfd < 0) {
@@ -104,6 +117,7 @@ int tfb_acquire_fb(u32 flags, const char *fb_device, const char *tty_device)
          goto out;
       }
    }
+#endif
 
    __fb_real_buffer = mmap(NULL, __fb_size,
                            PROT_READ | PROT_WRITE,
@@ -165,10 +179,12 @@ void tfb_release_fb(void)
    if (__fb_buffer != __fb_real_buffer)
       free(__fb_buffer);
 
+#ifdef ENABLE_TTY
    if (__tfb_ttyfd != -1) {
       ioctl(__tfb_ttyfd, KDSETMODE, KD_TEXT);
       close(__tfb_ttyfd);
    }
+#endif
 
    if (fbfd != -1)
       close(fbfd);
@@ -216,7 +232,7 @@ void tfb_flush_window(void)
 
 int tfb_flush_fb(void)
 {
-   __fbi.activate |= FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
+   __fbi.activate = FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
    if(ioctl(fbfd, FBIOPUT_VSCREENINFO, &__fbi) < 0) {
       return TFB_ERR_FB_FLUSH_IOCTL_FAILED;
    }

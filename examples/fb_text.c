@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <tfblib/tfblib.h>
 #include <tfblib/tfb_colors.h>
-
+#include <unistd.h>
 
 bool font_iter_callback(struct tfb_font_info *fi, void *user_arg)
 {
@@ -101,8 +101,7 @@ int main(int argc, char **argv)
    tfb_draw_string_scaled(20, tfb_get_curr_font_height() * 15,
                           tfb_green, tfb_gray, 2, -2, "16x32 scaled 2 x -2");
 
-   getchar();
-
+   sleep(5);
    tfb_release_fb();
    return 0;
 }
